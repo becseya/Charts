@@ -6,7 +6,12 @@ package dte.masteriot.mdp.chartexample;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -18,21 +23,19 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     List<Entry> lightSamples = new ArrayList<>();
     LineChart chart;
     LineData lineData;
     LineDataSet dataSetLight;
+    Sensor lightSensor;
+    SensorManager sensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        for (float x = 0; x <= 5; x += 1.0) {
-            lightSamples.add(new Entry(x, x+2));
-        }
 
         // Setup dataset
         List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
@@ -47,5 +50,30 @@ public class MainActivity extends AppCompatActivity {
         chart.setData(lineData);
         chart.getDescription().setEnabled(false);
         chart.invalidate(); // refresh
+
+        // Setup sensor
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void processNewLightMeasurement(float val) {
+        // Process data
+        lightSamples.add(new Entry(lightSamples.size(), val));
+
+        // Update UI
+        dataSetLight.notifyDataSetChanged();
+        lineData.notifyDataChanged();
+        chart.notifyDataSetChanged();
+        chart.invalidate();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        processNewLightMeasurement(sensorEvent.values[0]);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
     }
 }
