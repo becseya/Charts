@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">chartexample</string>
+    <string name="current_value">Current Value</string>
 </resources>

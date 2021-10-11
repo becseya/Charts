@@ -14,6 +14,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 
+import com.bendaschel.sevensegmentview.SevenSegmentView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -62,10 +63,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         lightSamples.add(new Entry(lightSamples.size(), val));
 
         // Update UI
+        updateSegmentDisplay((int) val);
         dataSetLight.notifyDataSetChanged();
         lineData.notifyDataChanged();
         chart.notifyDataSetChanged();
         chart.invalidate();
+    }
+
+    private void updateSegmentDisplay(int val) {
+        final int[] segmentIds = {R.id.seg0, R.id.seg1, R.id.seg2, R.id.seg3, R.id.seg4};
+        int pow10 = 1;
+
+        for (int id : segmentIds) {
+            SevenSegmentView segment = findViewById(id);
+
+            int digit = (val % (pow10 * 10)) / pow10;
+            segment.setCurrentValue(digit);
+            pow10 *= 10;
+        }
     }
 
     @Override

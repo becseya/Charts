@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "dte.masteriot.mdp.chartexample"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -30,5 +30,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.bendaschel:seven-segment-view:1.0'
 
 }
