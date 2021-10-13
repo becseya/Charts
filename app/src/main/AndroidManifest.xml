@@ -12,6 +12,7 @@
         <activity
             android:name=".AccelActivity"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="landscape"
             android:exported="true" />
         <activity android:name=".MainActivity">
             <intent-filter>
