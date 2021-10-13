@@ -13,6 +13,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.bendaschel.sevensegmentview.SevenSegmentView;
 import com.github.mikephil.charting.charts.LineChart;
@@ -32,6 +33,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     LineDataSet dataSetLight;
     Sensor lightSensor;
     SensorManager sensorManager;
+    TextView txtAvg;
+    TextView txtMin;
+    TextView txtMax;
+    float statSum = 0;
+    float statMin = -1;
+    float statMax = 100000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +63,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         sensorManager.registerListener(this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        // Connect UI
+        txtAvg = findViewById(R.id.txtAvgVal);
+        txtMax = findViewById(R.id.txtMaxVal);
+        txtMin = findViewById(R.id.txtMinVal);
     }
 
     private void processNewLightMeasurement(float val) {
         // Process data
         lightSamples.add(new Entry(lightSamples.size(), val));
+
+        if (val < statMin)
+            statMin = val;
+        if (val > statMin)
+            statMax = val;
+        statSum += val;
 
         // Update UI
         updateSegmentDisplay((int) val);
@@ -68,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         lineData.notifyDataChanged();
         chart.notifyDataSetChanged();
         chart.invalidate();
+        txtAvg.setText(String.format("%.1f", statSum / lightSamples.size()));
+        txtMax.setText(String.format("%.1f", statMax));
+        txtMin.setText(String.format("%.1f", statMin));
     }
 
     private void updateSegmentDisplay(int val) {
