@@ -7,12 +7,14 @@ package dte.masteriot.mdp.chartexample;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.bendaschel.sevensegmentview.SevenSegmentView;
@@ -111,5 +113,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    public void onBtnGyroscope(View v) {
+        Intent intent = new Intent(this, AccelActivity.class);
+        startActivity(intent);
     }
 }
