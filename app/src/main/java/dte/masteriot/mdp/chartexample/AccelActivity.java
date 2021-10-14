@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -12,12 +15,16 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AccelActivity extends AppCompatActivity {
 
     LineChart chart;
     LineData lineData;
     ArrayList<AxisDataset> axes = new ArrayList<>();
+    Handler handler;
+    ExecutorService es;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +48,23 @@ public class AccelActivity extends AppCompatActivity {
         chart.getDescription().setEnabled(false);
         chart.invalidate();
 
-        // fake data
-        for (int i = 0; i < 3; i++) {
-            for (float x = 0; x <= 5; x += 1.0) {
-                axes.get(i).samples.add(new Entry(x, x+i+1));
+        // Setup handler
+        handler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                int idx = axes.get(0).samples.size();
+
+                axes.get(0).samples.add(new Entry(idx, msg.getData().getFloat("x", 0)));
+                axes.get(1).samples.add(new Entry(idx, msg.getData().getFloat("y", 0)));
+                axes.get(2).samples.add(new Entry(idx, msg.getData().getFloat("z", 0)));
+
+                invalidateChart();
             }
-        }
-        invalidateChart();
+        };
+
+        // Start thread
+        es = Executors.newSingleThreadExecutor();
+        es.execute(new AccelWatcher(handler, this));
     }
 
     private void invalidateChart() {
